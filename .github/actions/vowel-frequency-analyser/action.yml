@@ -1,0 +1,17 @@
+name: Vowel Frequency Analyser
+description: Count vowels in a text file and append results to README
+
+inputs:
+  file:
+    description: Path to the text file
+    required: true
+  contributor:
+    description: Username of the contributor
+    required: true
+
+runs:
+  using: docker
+  image: ../../../Dockerfile
+  env:
+    FILE: ${{ inputs.file }}
+    GITHUB_USER: ${{ inputs.contributor }}

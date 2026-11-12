@@ -1,0 +1,44 @@
+name: Analyse Vowels
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - data.txt
+      - Dockerfile
+      - ".github/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vowel-analysis-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  analyse:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run Docker vowel analyser
+        uses: ./.github/actions/vowel-frequency-analyser
+        with:
+          file: data.txt
+          contributor: ${{ github.actor }}
+
+      - name: Commit README results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Record vowel analysis results"
+            git push
+          fi
